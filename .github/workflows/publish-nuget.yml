@@ -1,0 +1,44 @@
+name: Publish to NuGet
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+    env:
+      SOLUTION_FILE: Mediator.Lite.sln
+      PROJECT_PATH: ./Mediator.Lite.csproj
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION_FILE }}
+    
+    - name: Build solution
+      run: dotnet build ${{ env.SOLUTION_FILE }} --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test ${{ env.SOLUTION_FILE }} --configuration Release --no-build
+
+    - name: Create NuGet package
+      run: |
+        mkdir nupkgs
+        dotnet pack ${{ env.PROJECT_PATH }} \
+          --configuration Release \
+          --no-build \
+          --output ./nupkgs
+    
+    - name: Push to NuGet
+      if: startsWith(github.ref, 'refs/heads/main')
+      run: dotnet nuget push "./nupkgs/*.nupkg" \
+        --api-key ${{ secrets.NUGET_API_KEY }} \
+        --source https://api.nuget.org/v3/index.json
