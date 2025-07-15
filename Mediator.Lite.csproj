@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>Mediator.Lite</PackageId>
-    <Version>0.0.0</Version>
+    <Version>0.0.1</Version>
     <Authors>Wengwalker</Authors>
     <Title>Mediator.Lite library</Title>
     <Description>Simple implementation of mediator for .NET</Description>
