@@ -41,21 +41,15 @@ jobs:
 
         echo "TAG=$TAG" >> $GITHUB_ENV
         echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-        echo "tag=$TAG" >> $GITHUB_OUTPUT
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Tag merge commit in master
       run: |
-        if git rev-parse -q --verify "refs/tags/${{ env.TAG }}" >/dev/null; then
-          if [ $(git rev-parse ${{ env.TAG }}) != $(git rev-parse HEAD) ]; then
-            echo "::error::Tag ${{ env.TAG }} already exists on different commit"
-            exit 1
-          fi
-          echo "Tag ${{ env.TAG }} already exists on current commit"
-        else
-          git tag ${{ env.TAG }}
-          echo "Created tag ${{ env.TAG }} on $(git rev-parse --short HEAD)"
-        fi
+        git tag -d "${{ env.TAG }}" >/dev/null 2>&1 || true
+
+        git push origin ":refs/tags/${{ env.TAG }}" >/dev/null 2>&1 || true
+
+        git tag "${{ env.TAG }}"
+        echo "Recreated tag ${{ env.TAG }} on $(git rev-parse --short HEAD)"
 
     - name: Push tag to repository
       run: git push origin ${{ env.TAG }}
