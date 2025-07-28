@@ -1,24 +1,66 @@
 name: Publish to NuGet
 
 on:
-  push:
-    branches: [ main ]
+  pull_request:
+    types: [closed]
+    branches: [master]
 
 jobs:
   build-publish:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
       SOLUTION_FILE: Mediator.Lite.sln
       PROJECT_PATH: ./Mediator.Lite.csproj
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository with full history
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+
+    - name: Fetch develop branch and find latest tag
+      id: get_version
+      run: |
+        git fetch origin develop:develop
+
+        TAG=$(git describe --tags --abbrev=0 --match="v*.*.*" develop)
+        if [ -z "$TAG" ]; then
+          echo "::error::No tag found in develop branch"
+          exit 1
+        fi
+
+        VERSION="${TAG#v}"
+        echo "Latest tag: $TAG"
+        echo "Package version: $VERSION"
+
+        echo "TAG=$TAG" >> $GITHUB_ENV
+        echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Tag merge commit in master
+      run: |
+        if git rev-parse -q --verify "refs/tags/${{ env.TAG }}" >/dev/null; then
+          if [ $(git rev-parse ${{ env.TAG }}) != $(git rev-parse HEAD) ]; then
+            echo "::error::Tag ${{ env.TAG }} already exists on different commit"
+            exit 1
+          fi
+          echo "Tag ${{ env.TAG }} already exists on current commit"
+        else
+          git tag ${{ env.TAG }}
+          echo "Created tag ${{ env.TAG }} on $(git rev-parse --short HEAD)"
+        fi
+
+    - name: Push tag to repository
+      run: git push origin ${{ env.TAG }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
@@ -35,10 +77,12 @@ jobs:
         dotnet pack ${{ env.PROJECT_PATH }} \
           --configuration Release \
           --no-build \
-          --output ./nupkgs
+          --output ./nupkgs \
+          -p:PackageVersion=${{ env.PACKAGE_VERSION }}
     
     - name: Push to NuGet
-      if: startsWith(github.ref, 'refs/heads/main')
-      run: dotnet nuget push "./nupkgs/*.nupkg" \
+      if: startsWith(github.ref, 'refs/heads/master')
+      run: |
+        dotnet nuget push "./nupkgs/*.nupkg" \
         --api-key ${{ secrets.NUGET_API_KEY }} \
         --source https://api.nuget.org/v3/index.json
