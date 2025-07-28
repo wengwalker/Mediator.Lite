@@ -3,6 +3,8 @@ name: Publish to NuGet
 on:
   push:
     branches: [ main ]
+    tags:
+      - "v*.*.*"
 
 jobs:
   build-publish:
@@ -19,6 +21,13 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+
+    - name: Extract Package Version
+      id: version
+      run: |
+        TAG="${GITHUB_REF#refs/tags/v}"
+        echo "Package version extracted: $TAG"
+        echo "PACKAGE_VERSION=$TAG" >> $GITHUB_ENV
     
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
@@ -35,10 +44,12 @@ jobs:
         dotnet pack ${{ env.PROJECT_PATH }} \
           --configuration Release \
           --no-build \
-          --output ./nupkgs
+          --output ./nupkgs \
+          -p:PackageVersion=${{ env.PACKAGE_VERSION }}
     
     - name: Push to NuGet
       if: startsWith(github.ref, 'refs/heads/main')
-      run: dotnet nuget push "./nupkgs/*.nupkg" \
+      run: |
+        dotnet nuget push "./nupkgs/*.nupkg" \
         --api-key ${{ secrets.NUGET_API_KEY }} \
         --source https://api.nuget.org/v3/index.json
