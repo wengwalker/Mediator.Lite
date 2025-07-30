@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SOLUTION_FILE: Mediator.Lite.sln
-      PROJECT_PATH: ./Mediator.Lite.csproj
+      PROJECT_PATH: ./Mediator.Lite/Mediator.Lite.csproj
 
     steps:
     - name: Checkout repository with full history
