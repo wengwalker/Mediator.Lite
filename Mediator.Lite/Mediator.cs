@@ -7,7 +7,7 @@ public class Mediator : IMediator
 {
     private readonly IServiceProvider _serviceProvider;
 
-    private static readonly ConcurrentDictionary<Type, Type> _requestHandlerTypes = new();
+    private static readonly ConcurrentDictionary<Type, Type> RequestHandlerTypes = new();
 
     public Mediator(IServiceProvider serviceProvider)
     {
@@ -20,7 +20,7 @@ public class Mediator : IMediator
 
         var requestType = request.GetType();
 
-        var handlerType = _requestHandlerTypes.GetOrAdd(requestType,
+        var handlerType = RequestHandlerTypes.GetOrAdd(requestType,
             t => typeof(IRequestHandler<,>).MakeGenericType(t, typeof(TResponse)));
 
         var handler = _serviceProvider.GetService(handlerType)
