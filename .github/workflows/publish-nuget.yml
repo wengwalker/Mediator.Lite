@@ -24,38 +24,6 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: Fetch develop branch and find latest tag
-      id: get_version
-      run: |
-        git fetch origin develop:develop
-
-        TAG=$(git describe --tags --abbrev=0 --match="v*.*.*" develop)
-        if [ -z "$TAG" ]; then
-          echo "::error::No tag found in develop branch"
-          exit 1
-        fi
-
-        VERSION="${TAG#v}"
-        echo "Latest tag: $TAG"
-        echo "Package version: $VERSION"
-
-        echo "TAG=$TAG" >> $GITHUB_ENV
-        echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-
-    - name: Tag merge commit in master
-      run: |
-        git tag -d "${{ env.TAG }}" >/dev/null 2>&1 || true
-
-        git push origin ":refs/tags/${{ env.TAG }}" >/dev/null 2>&1 || true
-
-        git tag "${{ env.TAG }}"
-        echo "Recreated tag ${{ env.TAG }} on $(git rev-parse --short HEAD)"
-
-    - name: Push tag to repository
-      run: git push origin ${{ env.TAG }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION_FILE }}
     
@@ -71,8 +39,7 @@ jobs:
         dotnet pack ${{ env.PROJECT_PATH }} \
           --configuration Release \
           --no-build \
-          --output ./nupkgs \
-          -p:PackageVersion=${{ env.PACKAGE_VERSION }}
+          --output ./nupkgs
     
     - name: Push to NuGet
       if: startsWith(github.ref, 'refs/heads/master')
