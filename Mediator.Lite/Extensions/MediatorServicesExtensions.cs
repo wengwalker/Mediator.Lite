@@ -1,21 +1,20 @@
 using Mediator.Lite.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
 
 namespace Mediator.Lite.Extensions;
 
 public static class MediatorServicesExtensions
 {
-    public static IServiceCollection AddMediator(this IServiceCollection services)
+    public static IServiceCollection AddMediator(this IServiceCollection services, Assembly assembly)
     {
-        services.AddTransient<IMediator, Mediator>();
+        services.TryAddTransient<IMediator, Mediator>();
 
-        AddMediatorHandlers(services, Assembly.GetExecutingAssembly());
-
-        return services;
+        return AddMediatorHandlers(services, assembly);
     }
 
-    private static void AddMediatorHandlers(IServiceCollection services, Assembly assembly)
+    private static IServiceCollection AddMediatorHandlers(IServiceCollection services, Assembly assembly)
     {
         var handlerTypes = assembly.GetTypes()
             .Where(t =>
@@ -23,18 +22,27 @@ public static class MediatorServicesExtensions
                   i.IsGenericType &&
                   i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)));
 
+        RegisterHandlers(services, typeof(IRequestHandler<,>), handlerTypes);
+
+        return services;
+    }
+
+    private static IServiceCollection RegisterHandlers(IServiceCollection services, Type type, IEnumerable<Type> handlerTypes)
+    {
         foreach (var handlerType in handlerTypes)
         {
             var handlerInterfaces = handlerType
                 .GetInterfaces()
                 .Where(i =>
                     i.IsGenericType &&
-                    i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
+                    i.GetGenericTypeDefinition() == type);
 
             foreach (var handlerInterface in handlerInterfaces)
             {
-                services.AddTransient(handlerInterface, handlerType);
+                services.TryAddTransient(handlerInterface, handlerType);
             }
         }
+
+        return services;
     }
 }
