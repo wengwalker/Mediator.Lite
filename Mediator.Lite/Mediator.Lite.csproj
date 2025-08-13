@@ -8,7 +8,7 @@
     <RootNamespace>Mediator.Lite</RootNamespace>
     <AssemblyName>Mediator.Lite</AssemblyName>
     <PackageId>Mediator.Lite</PackageId>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <Authors>Wengwalker</Authors>
     <Title>Mediator.Lite library</Title>
     <Description>Simple implementation of mediator for .NET</Description>
