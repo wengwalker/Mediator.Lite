@@ -1,13 +1,12 @@
-name: Publish Packages
+name: Build and Test
 
 on:
   pull_request:
     branches: [master]
-    types: [closed]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  build-publish:
-    if: github.event.pull_request.merged == true
+  build:
     runs-on: ubuntu-latest
     env:
       SOLUTION_FILE: Mediator.Lite.sln
@@ -37,17 +36,3 @@ jobs:
             --no-build \
             --no-restore \
             --verbosity normal
-
-      - name: Pack
-        run: |
-          mkdir nupkgs
-          dotnet pack ${{ env.PROJECT_PATH }} \
-            --configuration Release \
-            --no-build \
-            --output ./nupkgs
-    
-      - name: Push
-        run: |
-          dotnet nuget push "./nupkgs/*.nupkg" \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
-            --source https://api.nuget.org/v3/index.json
