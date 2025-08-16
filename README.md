@@ -20,13 +20,41 @@ Or with .NET CLI:
     dotnet add package Mediator.Lite
 ```
 
-### Using with Dependency Injection
+### How to use
 
-You need to register handlers through this extension method for `IServiceCollection`:
+To use this library you need to create an handlers by realizing `IRequestHandler` and register them in DI-container.
+
+To create a handler for the specified command, you need to create the following classes:
 ```csharp
-    services.AddMediator();
+public record YourCommand() : IRequest;
+
+public class YourCommandHandler : IRequestHandler<YourCommand>
+{
+    public Task Handle(YourCommand request, CancellationToken cancellationToken)
+    {
+        // Implementation...
+    }
+}
 ```
-When the `AddMediator()` method is called, it searches for classes that implement the `IRequestHandler` interface in the current assembly.
+Or if you need to return any response from handlers, you need to specify the response like this:
+```csharp
+public record YourCommandResponse();
+
+public record YourCommand() : IRequest<YourCommandResponse>;
+
+public class YourCommandHandler : IRequestHandler<YourCommand, YourCommandResponse>
+{
+    public Task<YourCommandResponse> Handle(YourCommand request, CancellationToken cancellationToken)
+    {
+        // Implementation...
+    }
+}
+```
+Then you need to register handlers through this extension method for `IServiceCollection` and specifying assembly to search:
+```csharp
+    services.AddMediator(typeof(YourCommandHandler).Assembly);
+```
+When the `AddMediator()` method is called, it registers the `Mediator` class for dependency resolving and looks for handler classes implementing the `IRequestHandler` interface (both `IRequestHandler<>` that does not return a response and `IRequestHandler<,>` that does return a response) in the specified assembly and registers them as dependencies.
 
 ### A few words
 
