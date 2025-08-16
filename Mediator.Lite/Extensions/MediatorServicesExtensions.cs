@@ -20,14 +20,16 @@ public static class MediatorServicesExtensions
             .Where(t =>
                 t.GetInterfaces().Any(i =>
                   i.IsGenericType &&
-                  i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)));
+                  (i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>) ||
+                  i.GetGenericTypeDefinition() == typeof(IRequestHandler<>))));
 
         RegisterHandlers(services, typeof(IRequestHandler<,>), handlerTypes);
+        RegisterHandlers(services, typeof(IRequestHandler<>), handlerTypes);
 
         return services;
     }
 
-    private static IServiceCollection RegisterHandlers(IServiceCollection services, Type type, IEnumerable<Type> handlerTypes)
+    private static void RegisterHandlers(IServiceCollection services, Type type, IEnumerable<Type> handlerTypes)
     {
         foreach (var handlerType in handlerTypes)
         {
@@ -42,7 +44,5 @@ public static class MediatorServicesExtensions
                 services.TryAddTransient(handlerInterface, handlerType);
             }
         }
-
-        return services;
     }
 }
