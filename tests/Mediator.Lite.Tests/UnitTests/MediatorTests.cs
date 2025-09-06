@@ -49,9 +49,11 @@ public class MediatorTests
         Mediator mediator)
     {
         // Arrange
+        object? responseService = null;
+
         serviceProviderMock
             .Setup(sp => sp.GetService(typeof(IRequestHandler<TestRequest>)))
-            .Returns(null);
+            .Returns(responseService);
 
         // Act
         var act = () => mediator.Send(request, It.IsAny<CancellationToken>());
@@ -105,9 +107,11 @@ public class MediatorTests
         Mediator mediator)
     {
         // Arrange
+        object? responseService = null;
+
         serviceProviderMock
             .Setup(sp => sp.GetService(typeof(IRequestHandler<TestRequestWithResponse, TestResponse>)))
-            .Returns(null);
+            .Returns(responseService);
 
         // Act
         var act = () => mediator.Send(request, It.IsAny<CancellationToken>());
