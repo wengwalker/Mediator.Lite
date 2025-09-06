@@ -16,6 +16,8 @@ public static class MediatorServicesExtensions
 
     private static IServiceCollection AddMediatorHandlers(IServiceCollection services, Assembly assembly)
     {
+        ArgumentNullException.ThrowIfNull(assembly);
+
         var handlerTypes = assembly.GetTypes()
             .Where(t =>
                 t.GetInterfaces().Any(i =>

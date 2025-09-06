@@ -11,6 +11,8 @@ public class Mediator : IMediator
 
     public Mediator(IServiceProvider serviceProvider)
     {
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+
         _serviceProvider = serviceProvider;
     }
 
@@ -26,8 +28,15 @@ public class Mediator : IMediator
         var handler = _serviceProvider.GetService(handlerType)
             ?? throw new InvalidOperationException($"Handler not found for {requestType.Name}");
 
-        return (Task)handlerType.GetMethod("Handle")!
-            .Invoke(handler, [request, cancellationToken])!;
+        try
+        {
+            return (Task)handlerType.GetMethod("Handle")!
+                .Invoke(handler, [request, cancellationToken])!;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken)
@@ -42,7 +51,14 @@ public class Mediator : IMediator
         var handler = _serviceProvider.GetService(handlerType)
             ?? throw new InvalidOperationException($"Handler not found for {requestType.Name}");
 
-        return (Task<TResponse>)handlerType.GetMethod("Handle")!
-            .Invoke(handler, [ request, cancellationToken ])!;
+        try
+        {
+            return (Task<TResponse>)handlerType.GetMethod("Handle")!
+                .Invoke(handler, [request, cancellationToken])!;
+        }
+        catch(Exception)
+        {
+            throw;
+        }
     }
 }
