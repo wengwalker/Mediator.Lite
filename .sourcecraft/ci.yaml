@@ -1,0 +1,67 @@
+on:
+  push:
+    - workflows: [build]
+      filter: 
+        branches: ["**"]
+  pull_request:
+    - workflows: [publish]
+      filter:
+        source_branches: ["develop"]
+        target_branches: ["master"]
+
+env:
+  SOLUTION_FILE: ./Mediator.Lite.sln
+  PROJECT_PATH: ./src/Mediator.Lite/Mediator.Lite.csproj
+
+workflows:
+  build:
+    tasks:
+    - name: build
+      cubes:
+      - name: build
+        image: mcr.microsoft.com/dotnet/sdk:8.0
+        script:
+          - |
+            set -e
+            dotnet restore $SOLUTION_FILE
+            
+            dotnet build $SOLUTION_FILE \
+              --configuration Release \
+              --no-restore
+
+            dotnet test $SOLUTION_FILE \
+              --configuration Release \
+              --no-build \
+              --no-restore \
+              --verbosity normal
+
+  publish:
+    tasks:
+    - name: publish
+      cubes:
+      - name: publish
+        image: mcr.microsoft.com/dotnet/sdk:8.0
+        script:
+          - |
+            set -e
+            dotnet restore $SOLUTION_FILE
+
+            dotnet build $SOLUTION_FILE \
+              --configuration Release \
+              --no-restore
+
+            dotnet test $SOLUTION_FILE \
+              --configuration Release \
+              --no-build \
+              --no-restore \
+              --verbosity normal
+
+            mkdir -p nupkgs
+            dotnet pack $PROJECT_PATH \
+              --configuration Release \
+              --no-build \
+              --output ./nupkgs
+
+        artifacts:
+          paths:
+            - nupkgs
