@@ -1,0 +1,81 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [master, develop]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  DOTNET_VERSION: 8.0.*
+  SOLUTION_FILE: Mediator.Lite.sln
+  PROJECT_PATH: ./src/Mediator.Lite/Mediator.Lite.csproj
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/NuGet
+          key: nuget=${{ runner.os }}-${{ hashFiles('**/*.sln', '**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION_FILE }}
+
+      - name: Build
+        run: |
+          dotnet build ${{ env.SOLUTION_FILE }} \
+            --configuration Release \
+            --no-restore
+
+      - name: Test
+        run: |
+          dotnet test ${{ env.SOLUTION_FILE }} \
+            --configuration Release \
+            --no-build \
+            --no-restore \
+            --verbosity normal
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+      - name: Add dotnet tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Install or update dotnet-format
+        run: |
+          dotnet tool update -g dotnet-format || dotnet tool install -g dotnet-format
+        
+      - name: Run formatter
+        run: |
+          dotnet format ${{ env.SOLUTION_FILE }} --verify-no-changes --no-restore \
+            || (echo "Code formatting issues detected. Run 'dotnet format' locally to fix." && exit 1)

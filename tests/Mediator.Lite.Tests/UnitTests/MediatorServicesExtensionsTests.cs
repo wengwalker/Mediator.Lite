@@ -19,7 +19,7 @@ public class MediatorServicesExtensionsTests
 
         // Assert
         Assert.Same(services, result);
-        
+
         var serviceProvider = services.BuildServiceProvider();
         var mediator = serviceProvider.GetService<IMediator>();
         Assert.NotNull(mediator);
@@ -39,7 +39,7 @@ public class MediatorServicesExtensionsTests
         // Assert
         var serviceProvider = services.BuildServiceProvider();
         var handler = serviceProvider.GetService<IRequestHandler<TestRequest>>();
-        
+
         Assert.NotNull(handler);
         Assert.IsType<TestRequestHandler>(handler);
     }
@@ -110,7 +110,7 @@ public class MediatorServicesExtensionsTests
     {
         // Arrange
         var services = new ServiceCollection();
-        
+
         var assembly = typeof(MultiInterfaceHandler).Assembly;
 
         // Act
@@ -120,7 +120,7 @@ public class MediatorServicesExtensionsTests
         var serviceProvider = services.BuildServiceProvider();
         var handler1 = serviceProvider.GetService<IRequestHandler<MultiInterfaceRequest1>>();
         var handler2 = serviceProvider.GetService<IRequestHandler<MultiInterfaceRequest2>>();
-        
+
         Assert.NotNull(handler1);
         Assert.NotNull(handler2);
         Assert.IsType<MultiInterfaceHandler>(handler1);
