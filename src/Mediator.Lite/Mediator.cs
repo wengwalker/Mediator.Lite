@@ -56,7 +56,7 @@ public class Mediator : IMediator
             return (Task<TResponse>)handlerType.GetMethod("Handle")!
                 .Invoke(handler, [request, cancellationToken])!;
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw;
         }
