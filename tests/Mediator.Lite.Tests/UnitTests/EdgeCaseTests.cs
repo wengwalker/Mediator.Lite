@@ -13,9 +13,9 @@ public class EdgeCaseTests
     {
         // Arrange
         var services = new ServiceCollection();
-        
+
         services.AddMediator(typeof(string).Assembly);
-        
+
         var serviceProvider = services.BuildServiceProvider();
 
         // Act
@@ -31,7 +31,7 @@ public class EdgeCaseTests
         // Arrange
         var services = new ServiceCollection();
         services.AddMediator(typeof(EdgeCaseTests).Assembly);
-        
+
         var serviceProvider = services.BuildServiceProvider();
         var mediator = serviceProvider.GetRequiredService<IMediator>();
 
@@ -47,11 +47,11 @@ public class EdgeCaseTests
     {
         // Arrange
         var services = new ServiceCollection();
-        
+
         services.AddMediator(typeof(EdgeCaseTests).Assembly);
-        
+
         var serviceProvider = services.BuildServiceProvider();
-        
+
         var mediator = serviceProvider.GetRequiredService<IMediator>();
 
         var cts = new CancellationTokenSource();
@@ -69,11 +69,11 @@ public class EdgeCaseTests
     {
         // Arrange
         var services = new ServiceCollection();
-        
+
         services.AddMediator(typeof(EdgeCaseTests).Assembly);
-        
+
         var serviceProvider = services.BuildServiceProvider();
-        
+
         var mediator = serviceProvider.GetRequiredService<IMediator>();
 
         // Act
