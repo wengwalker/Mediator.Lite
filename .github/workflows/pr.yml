@@ -26,7 +26,8 @@ jobs:
             const branch = context.payload.pull_request.head.ref;
             const rules = {
               'feature/': { labels: ['feature'], assignees: ['wengwalker'] },
-              'bugfix/':  { labels: ['bugfix'],  assignees: ['wengwalker'] }
+              'bugfix/':  { labels: ['bugfix'],  assignees: ['wengwalker'] },
+              'develop/': { labels: ['release'], assignees: ['wengwalker'] }
             };
 
             let config = null;
