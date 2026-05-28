@@ -2,8 +2,9 @@ Mediator.Lite
 =============
 
 ![License](https://img.shields.io/github/license/wengwalker/Mediator.Lite)
-[![Version](https://img.shields.io/nuget/v/Mediator.Lite)](https://www.nuget.org/packages/Mediator.Lite)
 [![Workflow Status](https://img.shields.io/github/actions/workflow/status/wengwalker/Mediator.Lite/publish.yml)](https://github.com/wengwalker/Mediator.Lite/actions)
+[![Version](https://img.shields.io/nuget/v/Mediator.Lite)](https://www.nuget.org/packages/Mediator.Lite)
+![Downloads](https://img.shields.io/nuget/dt/Mediator.Lite)
 
 Mediator.Lite - Lightweight implementation of mediator for .NET
 
