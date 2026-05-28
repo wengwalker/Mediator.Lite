@@ -11,7 +11,7 @@ permissions:
 
 env:
   DOTNET_VERSION: 8.0.*
-  SOLUTION_FILE: Mediator.Lite.sln
+  SOLUTION_FILE: Mediator.Lite.slnx
   PROJECT_PATH: ./src/Mediator.Lite/Mediator.Lite.csproj
 
 jobs:

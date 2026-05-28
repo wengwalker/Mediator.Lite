@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/build-and-test.yml" />
+    <File Path=".github/workflows/publish-nuget.yml" />
+  </Folder>
+  <Project Path="src/Mediator.Lite/Mediator.Lite.csproj" />
+  <Project Path="tests/Mediator.Lite.Tests/Mediator.Lite.Tests.csproj" />
+</Solution>
