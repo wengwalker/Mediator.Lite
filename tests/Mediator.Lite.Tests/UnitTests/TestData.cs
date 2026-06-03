@@ -1,4 +1,4 @@
-﻿using Mediator.Lite.Interfaces;
+using Mediator.Lite.Interfaces;
 
 namespace Mediator.Lite.Tests.UnitTests;
 
@@ -30,7 +30,7 @@ public class LongRunningRequestHandler : IRequestHandler<LongRunningRequest>
 {
     public async Task Handle(LongRunningRequest request, CancellationToken cancellationToken)
     {
-        await Task.Delay(request.DelayMs, cancellationToken);
+        await Task.Delay(request.DelayMs, cancellationToken).ConfigureAwait(false);
     }
 }
 

@@ -57,11 +57,12 @@ public class EdgeCaseTests
         var cts = new CancellationTokenSource();
 
         // Act
-        cts.Cancel();
+        await cts.CancelAsync();
         var act = () => mediator.Send(new LongRunningRequest(), cts.Token);
 
         // Act & Assert
         await Assert.ThrowsAsync<TaskCanceledException>(act);
+        cts.Dispose();
     }
 
     [Fact]

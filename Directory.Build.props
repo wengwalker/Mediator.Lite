@@ -1,0 +1,17 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforeCodeStyleInBuild>true</EnforeCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <AnalysisMode>All</AnalysisMode>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>
